@@ -1,4 +1,6 @@
 # Plotting mothur rarefaction data
+#  rarefaction.single() output file as used in Schloss SOP
+# is file used for input
 
 
 # read in rarefaction file
@@ -35,9 +37,6 @@ head(boo) # check all your samples are there.
 boo$numsampled<- data$numsampled
 
 head(boo) # check
-
-
-
 
 # and now to plotting
 
