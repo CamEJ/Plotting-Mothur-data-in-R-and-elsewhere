@@ -1,0 +1,63 @@
+# -------------------Making Krona plots from Mothur data-----------------#
+
+# used this webpage mostly
+
+# http://mealybugs-metagenomics.readthedocs.io/en/latest/13_krona_output.html
+
+# Go to this page and make sure you have the 5 things they list. 
+# I did this on an Ubuntu computer so it already has lxml, you just have to install it using following
+
+sudo pip install lxml
+
+# For Krona - download the .tar folder from here: https://github.com/marbl/Krona/wiki/Downloads
+# extract all the files then navigate to that folder by cd and execute the following: 
+ 
+sudo ./install.pl
+
+# (actually i made a specific working dir for this and put everything in the same folder)
+
+# for Krona go to 
+# https://github.com/accaldwell/mothur_krona
+# click green button 'clone or download' and Download .zip folder of mothur-krona stuff
+# again unzip in your wkdir
+
+# give yourself permission to run the python script of krona
+
+chmod u+x mothur_krona_XML.py
+
+# lastly, copy and paste your stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.cons.tax.summary
+# file from mothur folder into your current krona wkdir
+
+# run following
+# note - in my case, I have chosen to give the output file the name krona_output.xml
+
+python ./mothur_krona_XML.py /home/femlab/Cam/KronaTestLimecDNA/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.cons.tax.summary > /home/femlab/Cam/KronaTestLimecDNA/krona_output.xml
+
+# if no error, will just return a blank screen when he's finished. (if error see end of this doc)
+# then we convert this xml to an html so we can open it online
+
+
+ktImportXML -o krona_11Aug.html krona_output.xml
+
+# where the output file will be called krona_11Aug.html
+
+# out of terminal, go to your krona folder and find this file, double click and it will open web browser
+# and Ta Dah!!
+
+_____________________________________________
+
+## if you get an error like "from: can't read /var/mail/lxml"
+## then open the python script of caldwell
+# delete first line with author name and replace it with a line that tells computer where to look for python 
+# this line is called A shebang which is the first line of the file. Its what the system is looking for in order to execute a file.
+
+# this is what I added (including the hashmark at the beginning)
+
+#!/home/femlab/anaconda2/bin/python python
+
+
+# if you don't know the route to where your python is then go to terminal and type 
+
+which python
+
+# and it'll tell you.
