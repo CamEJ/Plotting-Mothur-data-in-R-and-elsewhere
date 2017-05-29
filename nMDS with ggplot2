@@ -1,0 +1,114 @@
+# plotting mothur nMDS WP3 DNA
+
+mothurNMDS <- as.data.frame(read.table("2Axes-stability.opti_mcc.thetayc.0.03.lt.ave.nmds.axes", header=T))
+
+
+meTa <- read.table("SeqMetaDataDNA.txt", header = TRUE, row.names = 1, sep='\t')
+
+plot(NMDS2$points, col = meTa$timepoint)
+
+
+mothurNMDS$treatment<- meTa$Treatment
+mothurNMDS$treatment <- factor(data.scores$treatment, levels = mothurNMDS$treatment)
+mothurNMDS$time<- meTa$timepoint
+mothurNMDS$time <- factor(mothurNMDS$time, levels = mothurNMDS$time)
+mothurNMDS$phase<- meTa$Phase
+mothurNMDS$phase <- factor(mothurNMDS$phase, levels = mothurNMDS$phase)
+
+head(mothurNMDS)
+
+
+#
+NMDSplot <- ggplot(mothurNMDS, title='nMDS of MicroResp') +
+  geom_point(aes(x=axis1, y=axis2, color=time))
+NMDSplot
+
+
+## Modify shapes so can display the different phase within the days
+
+mothurNMDS.names = unique(mothurNMDS$phase)
+mothurNMDS.shape <- 1:(length(mothurNMDS.names))
+names(mothurNMDS.shape) <- mothurNMDS.names
+mothurNMDS.shape["samples"] <- 70
+
+
+# using ggplots default colour scheme:
+
+nMDS.Plot <- ggplot(mothurNMDS) +
+  geom_point(aes(x=axis1, y=axis2, color=treatment, shape = phase),size=8)  +
+  scale_shape_manual(values = mothurNMDS.shape) +
+  theme(legend.key.size=unit(0.3,"cm")) +
+  theme_bw() 
+nMDS.Plot
+##
+
+# use ggthemr to plot with my WP3 colour theme so 4 treatments
+# labelled as in all my other plots. 
+
+library(ggthemr)
+# define 
+WP3_colsA <- c("black", "chocolate4", "slateblue", "olivedrab")
+# add background
+WP3_cols <- c("#555555", WP3_colsA)
+
+# define palette
+WP3Cols <- define_palette(
+  swatch = WP3_cols, # colours for plotting points and bars
+  gradient = c(lower = WP3_cols[1L], upper = WP3_cols[2L]), #upper and lower colours for continuous colours
+  background = "white" #defining a grey-ish background 
+)
+
+# set new col theme as current
+
+ggthemr(WP3Cols)    
+
+# and replot with new color scheme
+
+nMDS.Plot <- ggplot(mothurNMDS) +
+  geom_point(aes(x=axis1, y=axis2, color=treatment, shape = phase),size=7, stroke=2)  +
+  scale_shape_manual(values = mothurNMDS.shape) +
+  theme(legend.key.size=unit(0.3,"cm")) +
+  theme_bw() 
+nMDS.Plot
+
+## now different way as i want to add labels next to each point
+## in order to ID timepoint
+
+
+P <- ggplot(mothurNMDS, aes(x= axis1, y= axis2, colour=treatment, shape=phase, label=time))+
+  geom_point(size=8, stroke=2)  +
+  scale_shape_manual(values = mothurNMDS.shape) +
+  theme(legend.key.size=unit(0.3,"cm")) +
+  theme_bw() 
+P
+
+## actually gonna change geompoint shapes as that cross thing is annoying
+
+P <- ggplot(mothurNMDS, aes(x= axis1, y= axis2, colour=treatment, shape=phase, label=time))+
+  geom_point(size=15, stroke=2)  + # size and line thickness of plotted points
+  scale_shape_manual(values = c(1, 5, 22)) +
+  theme(legend.key.size=unit(0.3,"cm")) +
+  theme_bw() 
+P
+
+# label each point with time. Put colour=control
+# as want all these labels in black text, otherwise looks messy.
+# play with hjust and vjust to move text around
+# h just moves text left to right ( left bigger the number)
+
+P2 <- P +geom_text(aes(label=time, colour="Control"),hjust=0.45, vjust=0.3, 
+                   size=4, fontface = "bold") 
+
+P2 + labs(shape="Phase", colour="Treatment") + # update legend titles.
+  # change legend icon size for Treatment
+  guides(color = guide_legend(override.aes = list(size=7))) + 
+  # change legend icon size for phase
+  guides(shape = guide_legend(override.aes = list(size=6))) +
+  # change spacing of legend icons. 
+  theme(legend.key.size = unit(1.8,"line"))
+
+
+# done. Play with export dims to get best. I found around 1200 width
+# was good but it depends how big you made points in the end. 
+
+## 
