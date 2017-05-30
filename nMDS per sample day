@@ -1,0 +1,59 @@
+# plotting mothur nMDS WP3 DNA
+
+mothurNMDS <- as.data.frame(read.table("T8nSub-stability.opti_mcc.thetayc.0.03.lt.nmds.axes", header=T))
+
+
+meTa <- read.table("T8b-meta.txt", header = TRUE, row.names = 1, sep='\t')
+
+
+mothurNMDS$treatment<- meTa$Treatment
+mothurNMDS$treatment <- factor(mothurNMDS$treatment, levels = mothurNMDS$treatment)
+mothurNMDS$time<- meTa$timepoint
+mothurNMDS$time <- factor(mothurNMDS$time, levels = mothurNMDS$time)
+mothurNMDS$phase<- meTa$Phase
+mothurNMDS$phase <- factor(mothurNMDS$phase, levels = mothurNMDS$phase)
+
+head(mothurNMDS)
+
+
+## Modify shapes so can display the different phase within the days
+
+mothurNMDS.names = unique(mothurNMDS$phase)
+mothurNMDS.shape <- 1:(length(mothurNMDS.names))
+names(mothurNMDS.shape) <- mothurNMDS.names
+mothurNMDS.shape["samples"] <- 12
+
+
+
+## and now plot
+
+P <- ggplot(mothurNMDS, aes(x= axis1, y= axis2, colour=treatment, shape=phase, label=time))+
+  geom_point(size=15, stroke=2)  + # size and line thickness of plotted points
+  scale_shape_manual(values = c(1, 5, 22)) +
+  theme(legend.key.size=unit(0.3,"cm")) +
+  theme_bw() 
+P
+
+# label each point with time. Put colour=control
+# as want all these labels in black text, otherwise looks messy.
+# play with hjust and vjust to move text around
+# h just moves text left to right ( left bigger the number)
+
+P2 <- P +geom_text(aes(label=time, colour="Control"),hjust=0.45, vjust=0.3, 
+                   size=4, fontface = "bold") 
+
+P2 + labs(shape="Phase", colour="Treatment") + # update legend titles.
+  # change legend icon size for Treatment
+  guides(color = guide_legend(override.aes = list(size=7))) + 
+  # change legend icon size for phase
+  guides(shape = guide_legend(override.aes = list(size=6))) +
+  # change spacing of legend icons. 
+  theme(legend.key.size = unit(1.8,"line"))
+
+
+# done. Play with export dims to get best. I found around 1200 width
+# was good but it depends how big you made points in the end. 
+
+## 
+
+
