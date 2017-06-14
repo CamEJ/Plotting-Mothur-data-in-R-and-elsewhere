@@ -106,3 +106,32 @@ BarNitrosomads <- plot_bar(microSubRelNitrosomads, fill="Genus", title="Nitrosom
 BarNitrosomads + facet_wrap(~SamplingTime, scales="free") + theme_bw() +
   theme(axis.text.x=element_text(angle=90, hjust=1, size=9, vjust=0.4))
 
+
+### copio and oligotrophs
+
+
+# Acidobacteria(100)
+## look phylum Acidobacteria(100)
+microSubRelAcido = subset_taxa(microSubRel, Phylum=="Acidobacteria(100)")
+BarAcido <- plot_bar(microSubRelAcido, fill="Class", title="Acidobacteria")
+## changes scale/day so cant see difference really so just use all together
+BarAcido + facet_wrap(~SamplingTime, scales="free") + theme_bw() +
+  theme(axis.text.x=element_text(angle=90, hjust=1, size=9, vjust=0.4))
+
+
+# Bacteroidetes(100)
+## look phylum Bacteroidetes(100)
+microSubRelBacto = subset_taxa(microSubRel, Phylum=="Bacteroidetes(100)")
+BarBacto <- plot_bar(microSubRelBacto, fill="Class", title="Bacteroidetes")
+## changes scale/day so cant see difference really so just use all together
+BarBacto + facet_wrap(~SamplingTime, scales="free") + theme_bw() +
+  theme(axis.text.x=element_text(angle=90, hjust=1, size=9, vjust=0.4))
+
+# Betaproteobacteria(100)
+## look class Betaproteobacteria(100)
+microSubRelBetaP = subset_taxa(microSubRel, Class=="Betaproteobacteria(100)")
+BarBetaP <- plot_bar(microSubRelBetaP, fill="Order", title="Betaproteobacteria")
+## changes scale/day so cant see difference really so just use all together
+BarBetaP + facet_wrap(~SamplingTime, scales="free") + theme_bw() +
+  theme(axis.text.x=element_text(angle=90, hjust=1, size=9, vjust=0.4))
+
