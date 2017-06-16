@@ -1,0 +1,59 @@
+## Making biom type file with abundunce, taxonomy and metadata in one. 
+# then read it out into a csv so dont have to read in heavy mothur files each time 
+
+
+library("phyloseq")
+library("plyr")
+library("vegan")
+library("grid")
+library("directlabels")
+library("knitr")
+library("clustsig")
+library("ellipse")
+
+# will use subsampled file with 70 samples and 28815 seq subsample depth.
+
+sharedsubFile = read.table('subsample.shared')
+sharedsubFile = t(sharedsubFile)
+rownames(sharedsubFile) = sharedsubFile[,1]
+colnames(sharedsubFile) = sharedsubFile[2,]
+sharedsubFile = sharedsubFile[,2:70]
+sharedsubFile = sharedsubFile[4:28815,]
+class(sharedsubFile) <- "numeric"
+head(sharedsubFile)
+
+taxFile = read.table('headed_cons.taxonomy', header=T, sep='\t')
+rownames(taxFile) = taxFile[,1]
+taxFile = taxFile[,2:8]
+taxFile = as.matrix(taxFile)
+head(taxFile)
+
+## import metadata file
+metaFile = read.table('DNA.metadataV2.txt', header=T, sep='\t')
+rownames(metaFile) = metaFile[,1]
+metaFile = metaFile[,2:7]
+head(metaFile)
+
+metaFile$SamplingTime <- factor(metaFile$SamplingTime, levels = metaFile$SamplingTime)
+
+## Create phyloseq object
+
+#OTU = otu_table(sharedFile, taxa_are_rows = TRUE)
+OTUsub = otu_table(sharedsubFile, taxa_are_rows = TRUE)
+TAX = tax_table(taxFile)
+META = sample_data(metaFile)
+#physeq = phyloseq(OTU, TAX, META)
+physeqSub = phyloseq(OTUsub, TAX, META)
+
+## Get rid of any OTUs not present in any samples and get relative abundance
+
+microSub <- prune_taxa(taxa_sums(physeqSub) > 0, physeqSub)
+microSubRel = transform_sample_counts(microSub, function(x) x / sum(x) )
+
+## readout phyloseq object, untrimmed
+dat <- psmelt(microSubRel)
+write.csv(dat, file='untrimmedPhyloseqOTU.csv')
+
+## that csv can then be read again and used to make rel abund plot etc 
+## using ggplot
+
