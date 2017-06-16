@@ -33,15 +33,15 @@ sharedFile = t(sharedFile) ## transform data
 rownames(sharedFile) = sharedFile[,1]  ## define rowname
 colnames(sharedFile) = sharedFile[2,]  ## define column names
 sharedFile = sharedFile[,2:48]       ## say which columns you want (remember order [row,colum]) 2 -> 48 for me
-## original => sharedFile = sharedFile[,2:219] 
-sharedFile = sharedFile[4:289407,]     ## and which rows you want. I have 289407 OTUs so I guess I change this number to 289407
+## as I had 48 samples
+sharedFile = sharedFile[4:289407,]     ## and which rows you want. I have 289407 OTUs so I changed this number to 289407
 # original => sharedFile = sharedFile[4:37368,]
 class(sharedFile) <- "numeric"
 
 head(sharedFile) ## look at head first 7 lines to see it's made correclty
 
 
-## Import subsampled otu matrix (53555 seqs)
+## Import subsampled otu matrix (26880 seqs)
 
 sharedsubFile = read.table('stability.an.0.03.subsample.shared')
 sharedsubFile = t(sharedsubFile)
