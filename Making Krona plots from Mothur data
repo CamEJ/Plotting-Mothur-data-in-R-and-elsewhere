@@ -4,7 +4,13 @@
 
 # http://mealybugs-metagenomics.readthedocs.io/en/latest/13_krona_output.html
 
-# Go to this page and make sure you have the 5 things they list. 
+# Go to this page and make sure you have the 5 things they list:
+#1 mothur
+#2 Python
+#3 Python script from Adam Caldwell)
+# 4krona
+# 5 lxml
+
 # I did this on an Ubuntu computer so it already has lxml, you just have to install it using following
 
 sudo pip install lxml
