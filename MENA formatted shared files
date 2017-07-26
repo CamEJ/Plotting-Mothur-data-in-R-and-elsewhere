@@ -1,0 +1,60 @@
+
+##  MENA formatted shared files
+
+## MENA pipline (for molecular ecology network analysis) 
+## requires tab delimited text files where
+## samples are the columns, not rows. IE mothur shared
+## files need to transformed. 
+
+## Import subsampled otu matrix (17768 seqs - is what was done in sub.sample)
+
+sharedsubFile = read.table('stability.an.0.03.subsample.shared')
+sharedsubFile = t(sharedsubFile)        # transform
+rownames(sharedsubFile) = sharedsubFile[,1]
+colnames(sharedsubFile) = sharedsubFile[2,]
+sharedsubFile = sharedsubFile[,2:48]    # define col no's
+sharedsubFile = sharedsubFile[4:17770,] # define row no's use # from sub.sample + 1
+class(sharedsubFile) <- "numeric"
+head(sharedsubFile)
+
+# read it out 
+
+write.csv(sharedsubFile, file='sharedsubFile.csv')
+
+# if you want to do network of all your treatments in one go, 
+## then open this file in excel, put 'ID' as header of column1
+# then save it as tab delimited .txt file
+# now it's ready for MENA
+
+## if you want to split your shared file to make separate
+## networks for each treatment then read this csv back in as below
+## and choose the appropriate column names to make separate otu tables for each
+## treatment. These are then read out. 
+
+yy <- read.csv("sharedsubFile.csv", header = TRUE, row.names=1)
+
+# Treatment1 is samples in columns 1 - 15 incl.
+ElongDNAsub = yy[,1:15]
+
+write.csv(ElongDNAsub, file='ElongDNAsub.csv')
+
+# Treatment2 is samples in columns 16 - 31 incl.
+HeadingDNAsub = yy[,16:31]
+
+write.csv(HeadingDNAsub, file='HeadingDNAsub.csv')
+
+# Treatment3 is samples in columns 32 - 47 incl.
+RipenDNAsub = yy[,32:47]
+
+write.csv(RipenDNAsub, file='RipenDNAsub.csv')
+
+## now open each of these in excel
+## check 'ID' as column 1 name
+## then save as tab delimited text file (must be this or won't work on pipeline)
+## now it's ready for MENA pipeline
+
+## http://129.15.40.240/MENA/main.cgi
+
+
+
+
