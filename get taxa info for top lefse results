@@ -1,0 +1,20 @@
+## get taxa info for top lefse results
+
+# read in cons.taxonomy file
+dataFull <- read.table(file="HEADEDconsTax.txt", header=T)
+#ie  this is a full dataframe of ALL my otus with their taxonomy information
+
+
+# Lefse-ids.txt is doc just with one column which contains list of OTUs that
+# have small p vals and have highest LDA score
+
+dataCut <- read.table(file="Lefse-ids.txt", header=T)
+
+# now merge
+zz <- merge(dataCut, taxFile, by = "OTU")
+
+# write it out so can open / use to plot etc
+write.csv(zz, file='DNAtopLefseTaxaInfo.csv')
+
+
+
