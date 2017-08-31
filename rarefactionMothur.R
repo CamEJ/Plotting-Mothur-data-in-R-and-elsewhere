@@ -67,6 +67,40 @@ r3 <- r2 + theme_bw() +  theme(legend.position="none")
 r3
 
 
+################ another version, for better legend text & general prettiness --------------------------
+
+
+# set colours to use in line (i have 6 lines in this eg therefor 6 cols)
+lineCol = c("red", "orange1", "blue4", "lightslateblue", "darkgreen", "seagreen1")
+
+# plotting 
+r <- ggplot() + 
+  geom_line(data=booM, aes(x=numsampled, y=value, 
+                              group=variable, colour=variable), size = 1.5) +
+scale_colour_manual(values = lineCol, labels = c("DNA 1", "DNA 2", "DNA 3", "cDNA 1", "cDNA 2", "cDNA 3"))
+# where label = c() is where you put new labels you want in legend
+r
+
+## axis labels to plot
+
+r2 <- r +  labs(x="Number of Sequences", y = "Number of OTUs") 
+
+## change background of plot to white with theme_bw() 
+## remove legend title as there's no point
+
+r3 <- r2 + theme_bw() +  theme(legend.title=element_blank())
+
+r4 = r3 +   theme(legend.key = element_rect(size = 5),
+                  legend.key.size = unit(1.5, 'lines')) 
+                  
+r4 + 
+theme(axis.text.x=element_text(size=14, vjust=0.5, color = "black"), 
+  axis.text.y=element_text(size=14, vjust=0.5, color = "black"),
+  axis.title.x=element_text(size=16, vjust=0.25, face = "bold", color="black"),
+  axis.title.y=element_text(size=16, vjust=1, face = "bold", color="black"),
+  legend.text=element_text(size=16, vjust=0.5)
+)
 
 
 
+# print save as pdf
