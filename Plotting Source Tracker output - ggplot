@@ -1,0 +1,148 @@
+# replotting sourcetracker output as stacked bars instead of 
+# pie plots
+# this continues on directly from 'source tracker usage.R'
+
+# ===================reading data out to plot more clearly======================
+
+PieNos = results$proportions
+PieNos = as.data.frame(PieNos)
+
+# in order to group and summarise samples (ie average) we will add metadata back
+# and this will allow grouping of samples
+  metadata$id = row.names(metadata) 
+  PieNos$id = row.names(PieNos)
+  zz <- merge(PieNos, metadata, by = "id")
+
+  require(dplyr)
+  # grouping and summarising variables within a df called 'zz'
+  # to get mean and sd of each
+  
+              PieAvs <- zz %>% # choose name of new df (here it's PieAvs) to which new data will be put
+                group_by(Description) %>% # group by sample
+                summarise(Slurry = mean(slurry),  # then use summarise to work out mean etc for each diff group
+                          Soil = mean(soil), # where each of these will be a new column in new df 
+                          unknown = mean(Unknown),
+                          time = first(timepoint),
+                          treatment = first(Treatment),
+                          varSlurry = sd(slurry), # and cols of sdev
+                          varSoil = sd(soil), 
+                          varUnknown = sd(Unknown))
+ 
+              write.csv(PieAvs, "averagesOutPutPiesSourceTracker.csv")
+              
+# ============================= and now to plotting =============================== # 
+setwd("~/Desktop/sourcetracker-1.0.1")
+pies <- read.csv('averagesOutPutPiesSourceTracker.csv',h=T,row.names=1)
+
+library(ggplot2) 
+library(reshape2)
+
+# I ran into problems with the order ggplot wanted to plot my factors
+# so i opened averagesOutPutPiesSourceTracker.csv and added a new column called Day
+# which I used numbers alone (no T prefix) so ggplot would put them in order
+
+
+# =============== subset by treatment to make one plot for each tmt ============== #
+library(dplyr)
+PS = subset(pie, (treatment %in% c("Slurry")))
+PS$Day = factor(PS$Day)
+
+PSF =  subset(pie, !(treatment %in% c("Slurry")))
+PSF$Day = factor(PSF$Day)
+
+# set labels
+myLabs = c("0 ", "3 ", "6 ", "15 ", "29 ",
+           "92 ", "114", "140")
+
+# ============= plot slurry data now =================
+
+Splot = ggplot(PS, aes(x=Day, y=prop*100, fill=source)) + # time prop by 100 to give %
+  geom_bar(stat="identity") + # add bars
+  geom_text( # adding labels to end of bars where spaces are included to = correct no (24) as only want text for slurry%
+    aes(label = c("26.9%", "", "", "24.3%","", "", " 2.8%", "", ""," 1.0%", "", ""," 0.9%", "", ""," 0.3%","", "", " 0.1%", "", "",  " 0.2%", "", "")),    
+    size = 5, hjust = -0.05,  position = "stack", inherit.aes = TRUE, colour="black") +
+  coord_flip()+ # flip axes
+  theme_classic() + #change theme
+  theme(axis.text.x=element_text(size=15, colour="black"),
+        axis.text.y=element_text(size=15, colour="black"),
+        axis.title.y=element_text(colour="black", size = 15),
+        legend.text=element_text(colour="black", size = 15),
+        legend.title=element_text(colour="black", size = 16),
+        axis.title.x=element_text(colour="black", size = 15),
+        legend.key.size = unit(1.2, "cm"), # make legend biffer
+        legend.position = "top",
+        plot.margin = unit(c(0.5,1.5,0.5,0.5), "cm"))+ # increase margins to make space for % labels
+  labs(y = "\nPercentage abundance attributed to source", x="Days post slurry amendment", fill="                    Source\n ")+
+  scale_x_discrete(labels= myLabs) +
+  guides(fill = guide_legend(title.position = "top"))
+
+Splot
+# percentage labels are hidden by clipping so now
+# use grid to turn off clipping
+
+library(grid)
+gt <- ggplot_gtable(ggplot_build(Splot))
+gt$layout$clip[gt$layout$name == "panel"] <- "off"
+grid.draw(gt)
+
+
+# ============= plot flood + slurry data now =================
+
+Flood = ggplot(PSF, aes(x=Day, y=prop*100, fill=source)) + 
+  geom_bar(stat="identity") + 
+ geom_text(
+  aes(label = c(rep("",6), "12.5%", "", "", " 5.4%","", "", " 2.4%", "", ""," 0.6%", "", ""," 0.2%", "", ""," 0.4%","", "")),
+  size = 5, hjust = -0.05,  position = "stack", inherit.aes = TRUE, colour="black") +
+  coord_flip()+ # flip axes
+  theme_classic() + #change theme
+  theme(axis.text.x=element_text(size=15, colour="black"),
+        axis.text.y=element_text(size=15, colour="black"),
+        axis.title.y=element_text(colour="black", size = 15),
+        legend.text=element_text(colour="black", size = 15),
+        legend.title=element_text(colour="black", size = 16),
+        axis.title.x=element_text(colour="black", size = 15),
+        legend.key.size = unit(1.2, "cm"), # make legend bigger
+        legend.position = "top", # set legend to go on top of plot
+        plot.margin = unit(c(0.5,1.5,0.5,0.5), "cm"))+ # increase margins to make space for % labels
+  labs(y = "\nPercentage abundance attributed to source", x="Days post slurry amendment", fill="                    Source\n ")+
+  scale_x_discrete(labels= myLabs) + # add labels specified before
+  guides(fill = guide_legend(title.position = "top")) # set legend position above legend icons. 
+
+Flood
+
+library(grid)
+
+gt <- ggplot_gtable(ggplot_build(Flood))
+gt$layout$clip[gt$layout$name == "panel"] <- "off"
+grid.draw(gt)
+
+
+
+# =================== specifying colours using ggthemr =================================#
+library(ggthemr)
+
+WP3_colsA <- c("yellow4", "chocolate4", "slateblue", "olivedrab")
+# add background white (#55555)
+WP3_cols <- c("#555555", WP3_colsA)
+
+# define palette
+WP3Cols <- define_palette(
+  swatch = WP3_cols, # colours for plotting points and bars
+  gradient = c(lower = WP3_cols[1L], upper = WP3_cols[2L]), #upper and lower colours for continuous colours
+  background = "white" #defining a grey-ish background 
+)
+
+# set new col theme as current
+
+ggthemr(WP3Cols)   
+
+
+# ================
+orinigal efforts at keeping factors in order
+
+
+pie <- read.table('PieDataordered.txt',sep='\t',h=T)
+
+pie[["time"]] <- setFactorOrder(pie[["time"]], c("T0", "T2", "T3", "T5", "T7", "T8", "T11", "T13"))
+# set factor order of id based on order of time
+pie$id = factor(pie$id, level =  unique(pie$id[order(pie$time)]))
