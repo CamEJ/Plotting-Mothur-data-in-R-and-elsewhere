@@ -44,3 +44,7 @@ write.csv(zz, file='Tmt1_d0_3_nodeFile.csv')
 
 
 # now read these two into Gephi
+# I followed this great tutorial on youtube for how to read data 
+# into Gephi and getting started with making it more pretty etc
+
+#     https://www.youtube.com/watch?v=HJ4Hcq3YX4k
