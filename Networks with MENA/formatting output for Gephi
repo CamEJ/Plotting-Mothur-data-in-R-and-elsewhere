@@ -1,0 +1,46 @@
+# Gephi is nice to use for visualising networks 
+
+# here is how to format ouutput from MENA (cytoscape files)
+# for use in gephi
+
+# ==================== formatting MENA output for Gephi ====================
+
+
+# ==================== edge file =================================
+
+# read in MENA 'cytoscape' edge file and say sep is space " "
+edge <- read.table("Tmt1_d0_3 0.900 edge_attribute.txt", sep = " ", header=F)
+head(edge) #check
+
+edge = edge[,c(1,3)] # cut out to only keep two cols with otu info
+head(edge) # check
+
+colnames(edge) = c("Source", "Target") # give column names 'source ' and 'target'
+                                      # as required by MENA for edge file
+head(edge) # check
+
+# now write out as a .csv
+
+write.csv(edge, "Tmt1_d0-3.csv", row.names=FALSE)
+
+
+# ==================== node file =================================
+
+# read in and say sep is space " "
+node <- read.table("Tmt1_d0_3 0.900 node_attribute.txt", sep = "\t", header=T)
+head(node) #check
+colnames(node)[1] <- "OTU" # assign otu col with colname of otus in tax file...
+
+# read in taxonomy table
+tax <- read.csv("WP3_headedCons.taxonomy.csv", header=T)
+head(tax)
+row.names(data) = data$OTU_ID
+
+# mergs node file with tax file to pull taxonomy info out for otus listed in node file
+zz <- merge(node, tax, by = "OTU")
+
+# write it out. 
+write.csv(zz, file='Tmt1_d0_3_nodeFile.csv')
+
+
+# now read these two into Gephi
