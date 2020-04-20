@@ -19,7 +19,7 @@ head(data) # take a look to check col and row names
 
 library(dplyr)
 
-# now we'll tell R to use dplyr to make a new dataframe called boo
+# now we'll use dplyr to make a new dataframe called boo
 # containing only columns with the prefix "X0.03"
 # if you wanna plot the HCI or LCi ones then
 # change starts-with as appropriate.
