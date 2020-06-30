@@ -1,0 +1,19 @@
+
+## some bits for working with default ; separated taxonomy information eg in biom tables or constaxonomy table
+
+# first, if i have biomfile i get df with just otu ID as var1 and taxonomy as var2
+# in this example, the df is called 'taxa'
+
+# first I get rid of " using gsub
+taxa$taxonomy = gsub('"', '', taxa$taxonomy)
+
+
+#taxa$nice = as.data.frame(gsub("\\s*\\([^\\)]+\\)","",as.character(taxa$Taxonomy)))
+# then get rid of anything of brackets (eg mothur gives percent of how many were from that, like (100) )
+taxa$nice = gsub("\\s*\\([^\\)]+\\)","",taxa$taxonomy)
+
+head(taxa)
+# now split into columns - my otu table 6 levels, so i split and give names of my new vars
+MyPrettyDF = taxa %>% separate(nice, c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus"), ";")
+
+
