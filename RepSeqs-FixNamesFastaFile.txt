@@ -1,0 +1,55 @@
+# when getting rep seqs from mothur using get.oturep() the output has very long names for each OTU
+# if you wanna use this file to match up to your otu table for some analysis, then the names
+# need to be fixed to just be looking like this.
+# > OTU0001
+# > agtcacgtacgtacgtac
+
+library("Biostrings")
+
+seq2 = readDNAStringSet("final.16s.opti_mcc.0.03.rep.fasta")
+str(seq2)
+
+seq2d<- as.data.frame(seq2)
+seq_name = as.data.frame(names(seq2))
+str(seq_name)
+
+
+library(stringr)
+# a function to pull out OTUs out of long string that is currently the name
+f1 <- function(string, n, chr)
+{
+  pat <- sprintf("(?<=%s)%s", chr, strrep(".", n))
+  str_extract_all(string, pat)[[1]]
+}
+
+nm = f1(seq_name, 5, "Otu") # use function f1 to pull the 5 letters after Otu out of 'seq_name'
+nmy = as.data.frame(paste('Otu', f1(seq_name, 5, "Otu"), sep=""))
+nmy[1]
+
+seq2d$OTU <- nmy$`paste("Otu", f1(seq_name, 5, "Otu"), sep = "")`
+head(seq2d)
+
+# for the write fasta functin below to work, our sequence must be in var with name 'seq'
+# and id of our OTU must be in var with name 'name'
+
+colnames(seq2d)[2] <- 'name'
+colnames(seq2d)[1] <- 'seq'
+
+writeFasta<-function(data, filename){
+  fastaLines = c()
+  for (rowNum in 1:nrow(data)){
+    fastaLines = c(fastaLines, as.character(paste(">", data[rowNum,"name"], sep = "")))
+    fastaLines = c(fastaLines,as.character(data[rowNum,"seq"]))
+  }
+  fileConn<-file(filename)
+  writeLines(fastaLines, fileConn)
+  close(fileConn)
+}
+
+# exampleData = dplyr::data_frame(name = c("seq1", "seq2", "seq3"),
+#                                 seq = c("AAGGTTTTGCCAA", "TTTTGCCAAGGAA", "TTTAAGGTGCCAA"), 
+#                                 other = c("meta1", "meta2", "meta3"))
+# 
+# writeFasta(exampleData, "example.fasta")
+
+writeFasta(seq2d, "RepSeq16S-allByOTU.fasta")
